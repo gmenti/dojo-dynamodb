@@ -1,0 +1,24 @@
+version: "3"
+services:
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_DEFAULT_REGION=us-east-1
+      - SERVICES=dynamodb
+    ports:
+      - '4566-4583:4566-4583'
+    volumes:
+      - "${TEMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  dynamodb_admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: dynamodb_admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://localstack:4566
+    depends_on:
+      - localstack
